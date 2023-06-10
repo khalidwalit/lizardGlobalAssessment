@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useReducer } from 'react';
+import './App.css';
 
 function App() {
   const initialState = {
@@ -72,7 +73,7 @@ function App() {
   };
 
   return (
-    <div>
+    <div className="container">
       <header>
         <h1>Blog Posts</h1>
       </header>
@@ -118,9 +119,11 @@ function App() {
             </li>
           ))}
         </ul>
-        {visiblePosts < filteredPosts.length && (
-          <button onClick={loadMore}>Load More</button>
-        )}
+        <div className="load-more-container">
+          {visiblePosts < filteredPosts.length && (
+            <button onClick={loadMore}>Load More</button>
+          )}
+        </div>
       </main>
       <footer>
         <p>&copy; 2023 My Blog</p>

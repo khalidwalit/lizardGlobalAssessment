@@ -1,46 +1,74 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 
 function App() {
-  const [posts, setPosts] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const [filteredPosts, setFilteredPosts] = useState([]);
-  const [visiblePosts, setVisiblePosts] = useState(5);
+  const initialState = {
+    posts: [],
+    filteredPosts: [],
+    visiblePosts: 5,
+  };
+
+  const [{ posts, filteredPosts, visiblePosts }, setState] =
+    useState(initialState);
+
+  const [selectedCategories, dispatchSelectedCategories] = useReducer(
+    (state, action) => {
+      switch (action.type) {
+        case 'ADD_CATEGORY':
+          return [...state, action.payload];
+        case 'REMOVE_CATEGORY':
+          return state.filter((category) => category !== action.payload);
+        default:
+          return state;
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     fetch('/api/posts')
       .then((res) => res.json())
       .then((json) => {
-        setPosts(json.posts);
-        setFilteredPosts(json.posts);
+        setState((prevState) => ({
+          ...prevState,
+          posts: json.posts,
+          filteredPosts: json.posts,
+        }));
       });
   }, []);
 
   const handleCategoryChange = (event) => {
     const { value, checked } = event.target;
     if (checked) {
-      setSelectedCategories((prevSelected) => [...prevSelected, value]);
+      dispatchSelectedCategories({ type: 'ADD_CATEGORY', payload: value });
     } else {
-      setSelectedCategories((prevSelected) =>
-        prevSelected.filter((category) => category !== value)
-      );
+      dispatchSelectedCategories({ type: 'REMOVE_CATEGORY', payload: value });
     }
   };
 
   useEffect(() => {
     if (selectedCategories.length === 0) {
-      setFilteredPosts(posts);
+      setState((prevState) => ({
+        ...prevState,
+        filteredPosts: prevState.posts,
+      }));
     } else {
       const filtered = posts.filter((post) =>
         post.categories.some((category) =>
           selectedCategories.includes(category.name)
         )
       );
-      setFilteredPosts(filtered);
+      setState((prevState) => ({
+        ...prevState,
+        filteredPosts: filtered,
+      }));
     }
   }, [selectedCategories, posts]);
 
   const loadMore = () => {
-    setVisiblePosts((prevVisible) => prevVisible + 5);
+    setState((prevState) => ({
+      ...prevState,
+      visiblePosts: prevState.visiblePosts + 5,
+    }));
   };
 
   return (

@@ -1,0 +1,21 @@
+# Use the official Node.js image as the base image
+FROM node:16.20.0 AS development
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Install dependencies
+COPY package.json yarn.lock /app/
+RUN yarn install --frozen-lockfile
+
+# Copy the application code
+COPY . /app/
+
+# Expose the development server port
+EXPOSE 3000
+
+# Set up volume for hard reloading
+VOLUME ["/app"]
+
+# Start the development server
+CMD ["yarn", "start"]

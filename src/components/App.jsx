@@ -10,7 +10,23 @@ function App() {
   }, []);
   console.log(posts);
 
-  return <div></div>;
+  return (
+    <div>
+      <ul>
+        {posts &&
+          posts.map((data) => {
+            return (
+              <>
+                <li key={data.id}>
+                  <h2>{data.title}</h2>
+                  {data.author && <p>{data.author.name}</p>}
+                </li>
+              </>
+            );
+          })}
+      </ul>
+    </div>
+  );
 }
 
 export default App;

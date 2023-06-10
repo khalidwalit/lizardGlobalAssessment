@@ -119,6 +119,12 @@ function App() {
             </li>
           ))}
         </ul>
+        <div className="post-count">
+          <p>
+            Showing {Math.min(visiblePosts, filteredPosts.length)} of{' '}
+            {filteredPosts.length} posts
+          </p>
+        </div>
         <div className="load-more-container">
           {visiblePosts < filteredPosts.length && (
             <button onClick={loadMore}>Load More</button>

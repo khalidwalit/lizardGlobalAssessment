@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 /**
- * This file can be ignored, please work in ./components/App.jsx
+ * This file can be ignored, please work in ./components/App.tsx
  */
 
 // Include mock API.

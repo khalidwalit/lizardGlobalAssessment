@@ -1,18 +1,41 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import './App.css';
 
+// Define the Post type
+type Post = {
+  id: number;
+  title: string;
+  author: {
+    name: string;
+  };
+  publishDate: string;
+  summary: string;
+  categories: {
+    id: number;
+    name: string;
+  }[];
+};
+
+function formatDate(dateString: string): string {
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  };
+  return new Date(dateString).toLocaleDateString(undefined, options);
+}
+
 function App() {
   const initialState = {
-    posts: [],
-    filteredPosts: [],
+    posts: [] as Post[],
+    filteredPosts: [] as Post[],
     visiblePosts: 5,
   };
 
-  const [{ posts, filteredPosts, visiblePosts }, setState] =
-    useState(initialState);
+  const [state, setState] = useState(initialState);
 
   const [selectedCategories, dispatchSelectedCategories] = useReducer(
-    (state, action) => {
+    (state: string[], action: { type: string; payload: string }) => {
       switch (action.type) {
         case 'ADD_CATEGORY':
           return [...state, action.payload];
@@ -37,7 +60,7 @@ function App() {
       });
   }, []);
 
-  const handleCategoryChange = (event) => {
+  const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = event.target;
     if (checked) {
       dispatchSelectedCategories({ type: 'ADD_CATEGORY', payload: value });
@@ -53,7 +76,7 @@ function App() {
         filteredPosts: prevState.posts,
       }));
     } else {
-      const filtered = posts.filter((post) =>
+      const filtered = state.posts.filter((post) =>
         post.categories.some((category) =>
           selectedCategories.includes(category.name)
         )
@@ -63,7 +86,7 @@ function App() {
         filteredPosts: filtered,
       }));
     }
-  }, [selectedCategories, posts]);
+  }, [selectedCategories, state.posts]);
 
   const loadMore = () => {
     setState((prevState) => ({
@@ -75,19 +98,19 @@ function App() {
   return (
     <div className="container">
       <header>
-        <h1>Blog Posts</h1>
+        <h1 className="title">Blog Posts</h1>
       </header>
       <section>
-        <h2>Filter by Category:</h2>
-        {posts.length > 0 &&
-          Array.from(
+        <h2 className="section-title">Filter by Category:</h2>
+        {state.posts.length > 0 &&
+          Array.from<string>(
             new Set(
-              posts.reduce((categories, post) => {
+              state.posts.reduce((categories: Set<string>, post) => {
                 post.categories.forEach((category) => {
                   categories.add(category.name);
                 });
                 return categories;
-              }, new Set())
+              }, new Set<string>())
             )
           ).map((categoryName) => (
             <div key={categoryName}>
@@ -103,33 +126,40 @@ function App() {
             </div>
           ))}
       </section>
+
       <main>
         <ul>
-          {filteredPosts.slice(0, visiblePosts).map((data) => (
-            <li key={data.id}>
-              <article>
-                <header>
-                  <h2>{data.title}</h2>
-                  {data.author && <p>{data.author.name}</p>}
-                  {data.publishDate && <p>{data.publishDate}</p>}
-                </header>
-                <p>{data.summary}</p>
-                {/* Add more properties here based on your data */}
-              </article>
-            </li>
-          ))}
+          {state.filteredPosts &&
+            state.filteredPosts.slice(0, state.visiblePosts).map((data) => (
+              <li key={data.id}>
+                <article className="post">
+                  <header>
+                    <h2 className="post-title">{data.title}</h2>
+                    {data.author && (
+                      <p className="post-author">{data.author.name}</p>
+                    )}
+                    {data.publishDate && (
+                      <p className="post-date">
+                        {formatDate(data.publishDate)}
+                      </p>
+                    )}
+                  </header>
+                  <p className="post-summary">{data.summary}</p>
+                </article>
+              </li>
+            ))}
         </ul>
-        <div className="post-count">
-          <p>
-            Showing {Math.min(visiblePosts, filteredPosts.length)} of{' '}
-            {filteredPosts.length} posts
-          </p>
-        </div>
-        <div className="load-more-container">
-          {visiblePosts < filteredPosts.length && (
-            <button onClick={loadMore}>Load More</button>
-          )}
-        </div>
+        <p className="post-count">
+          Showing {Math.min(state.visiblePosts, state.filteredPosts.length)} of{' '}
+          {state.filteredPosts.length} posts
+        </p>
+        {state.visiblePosts < state.filteredPosts.length && (
+          <div className="load-more-container">
+            <button className="load-more-button" onClick={loadMore}>
+              Load More
+            </button>
+          </div>
+        )}
       </main>
       <footer>
         <p>&copy; 2023 My Blog</p>

@@ -73,8 +73,11 @@ function App() {
 
   return (
     <div>
-      <div>
-        <label>Filter by Category:</label>
+      <header>
+        <h1>Blog Posts</h1>
+      </header>
+      <section>
+        <h2>Filter by Category:</h2>
         {posts.length > 0 &&
           Array.from(
             new Set(
@@ -87,30 +90,41 @@ function App() {
             )
           ).map((categoryName) => (
             <div key={categoryName}>
-              <input
-                type="checkbox"
-                value={categoryName}
-                checked={selectedCategories.includes(categoryName)}
-                onChange={handleCategoryChange}
-              />
-              <label>{categoryName}</label>
+              <label>
+                <input
+                  type="checkbox"
+                  value={categoryName}
+                  checked={selectedCategories.includes(categoryName)}
+                  onChange={handleCategoryChange}
+                />
+                {categoryName}
+              </label>
             </div>
           ))}
-      </div>
-      <ul>
-        {filteredPosts.slice(0, visiblePosts).map((data) => (
-          <li key={data.id}>
-            <h2>{data.title}</h2>
-            {data.author && <p>{data.author.name}</p>}
-            {data.publishDate && <p>{data.publishDate}</p>}
-            <p>{data.summary}</p>
-            {/* Add more properties here based on your data */}
-          </li>
-        ))}
-      </ul>
-      {visiblePosts < filteredPosts.length && (
-        <button onClick={loadMore}>Load More</button>
-      )}
+      </section>
+      <main>
+        <ul>
+          {filteredPosts.slice(0, visiblePosts).map((data) => (
+            <li key={data.id}>
+              <article>
+                <header>
+                  <h2>{data.title}</h2>
+                  {data.author && <p>{data.author.name}</p>}
+                  {data.publishDate && <p>{data.publishDate}</p>}
+                </header>
+                <p>{data.summary}</p>
+                {/* Add more properties here based on your data */}
+              </article>
+            </li>
+          ))}
+        </ul>
+        {visiblePosts < filteredPosts.length && (
+          <button onClick={loadMore}>Load More</button>
+        )}
+      </main>
+      <footer>
+        <p>&copy; 2023 My Blog</p>
+      </footer>
     </div>
   );
 }

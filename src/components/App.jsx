@@ -4,6 +4,7 @@ function App() {
   const [posts, setPosts] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
+  const [visiblePosts, setVisiblePosts] = useState(5);
 
   useEffect(() => {
     fetch('/api/posts')
@@ -38,38 +39,38 @@ function App() {
     }
   }, [selectedCategories, posts]);
 
+  const loadMore = () => {
+    setVisiblePosts((prevVisible) => prevVisible + 5);
+  };
+
   return (
     <div>
       <div>
         <label>Filter by Category:</label>
-        {posts.length > 0 && (
-          <>
-            {Array.from(
-              new Set(
-                posts.reduce((categories, post) => {
-                  console.log(categories);
-                  post.categories.forEach((category) => {
-                    categories.add(category.name);
-                  });
-                  return categories;
-                }, new Set())
-              )
-            ).map((categoryName) => (
-              <div key={categoryName}>
-                <input
-                  type="checkbox"
-                  value={categoryName}
-                  checked={selectedCategories.includes(categoryName)}
-                  onChange={handleCategoryChange}
-                />
-                <label>{categoryName}</label>
-              </div>
-            ))}
-          </>
-        )}
+        {posts.length > 0 &&
+          Array.from(
+            new Set(
+              posts.reduce((categories, post) => {
+                post.categories.forEach((category) => {
+                  categories.add(category.name);
+                });
+                return categories;
+              }, new Set())
+            )
+          ).map((categoryName) => (
+            <div key={categoryName}>
+              <input
+                type="checkbox"
+                value={categoryName}
+                checked={selectedCategories.includes(categoryName)}
+                onChange={handleCategoryChange}
+              />
+              <label>{categoryName}</label>
+            </div>
+          ))}
       </div>
       <ul>
-        {filteredPosts.map((data) => (
+        {filteredPosts.slice(0, visiblePosts).map((data) => (
           <li key={data.id}>
             <h2>{data.title}</h2>
             {data.author && <p>{data.author.name}</p>}
@@ -79,6 +80,9 @@ function App() {
           </li>
         ))}
       </ul>
+      {visiblePosts < filteredPosts.length && (
+        <button onClick={loadMore}>Load More</button>
+      )}
     </div>
   );
 }

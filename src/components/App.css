@@ -3,6 +3,12 @@
   margin: 0 auto;
   padding: 20px;
   padding-bottom: 60px;
+  background-color: #f0f0f0;
+}
+
+.container.dark {
+  background-color: #222;
+  color: #fff;
 }
 
 header {
@@ -39,6 +45,10 @@ article {
   border-radius: 5px;
 }
 
+.container.dark article {
+  background-color: #333;
+}
+
 button {
   padding: 10px 20px;
   background-color: #007bff;
@@ -48,8 +58,13 @@ button {
   cursor: pointer;
 }
 
+.container.dark button {
+  background-color: #555;
+}
+
 footer {
   text-align: center;
+  color: #777;
 }
 
 .load-more-container {
@@ -61,4 +76,58 @@ footer {
 .load-more-container button {
   padding: 10px 20px;
   font-size: 16px;
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.toggle-label {
+  margin-right: 10px;
+  color: #777;
+}
+
+.toggle-label.dark {
+  color: #fff;
+}
+
+.toggle-label::before {
+  content: '☀';
+  margin-right: 5px;
+}
+
+.toggle-label.dark::before {
+  content: '🌙';
+}
+
+.toggle-container input[type='checkbox'] {
+  width: 40px;
+  height: 20px;
+  appearance: none;
+  background-color: #ccc;
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+}
+
+.toggle-container input[type='checkbox']:checked {
+  background-color: #007bff;
+}
+
+.toggle-container input[type='checkbox']::before {
+  content: '';
+  width: 18px;
+  height: 18px;
+  background-color: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.toggle-container input[type='checkbox']:checked::before {
+  transform: translateX(20px);
 }

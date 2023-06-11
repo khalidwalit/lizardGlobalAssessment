@@ -50,6 +50,12 @@ function App() {
     []
   );
 
+  const [darkMode, setDarkMode] = useState(() => {
+    // Retrieve the darkMode state from localStorage or default to false
+    const storedDarkMode = localStorage.getItem('darkMode');
+    return storedDarkMode ? JSON.parse(storedDarkMode) : false;
+  });
+
   useEffect(() => {
     fetch('/api/posts')
       .then((res) => res.json())
@@ -61,6 +67,11 @@ function App() {
         }));
       });
   }, []);
+
+  useEffect(() => {
+    // Store the darkMode state in localStorage
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+  }, [darkMode]);
 
   const handleCategoryChange = (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -101,8 +112,23 @@ function App() {
     }));
   };
 
+  const toggleDarkMode = () => {
+    setDarkMode((prevMode: string) => !prevMode);
+  };
+
   return (
-    <div className="container">
+    <div className={`container ${darkMode ? 'dark' : ''}`}>
+      <div className="toggle-container">
+        <label htmlFor="darkModeToggle" className="toggle-label">
+          Dark Mode
+        </label>
+        <input
+          type="checkbox"
+          id="darkModeToggle"
+          checked={darkMode}
+          onChange={toggleDarkMode}
+        />
+      </div>
       <header>
         <h1 className="title">Blog Posts</h1>
       </header>

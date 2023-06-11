@@ -35,12 +35,14 @@ function App() {
   const [state, setState] = useState(initialState);
 
   const [selectedCategories, dispatchSelectedCategories] = useReducer(
-    (state: string[], action: { type: string; payload: string }) => {
+    (state: string[], action: { type: string; payload: string[] }) => {
       switch (action.type) {
         case 'ADD_CATEGORY':
-          return [...state, action.payload];
+          return [...state, ...action.payload];
         case 'REMOVE_CATEGORY':
-          return state.filter((category) => category !== action.payload);
+          return state.filter((category) => !action.payload.includes(category));
+        case 'SET_CATEGORIES':
+          return action.payload;
         default:
           return state;
       }
@@ -60,19 +62,22 @@ function App() {
       });
   }, []);
 
-  const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value, checked } = event.target;
-    if (checked) {
-      dispatchSelectedCategories({ type: 'ADD_CATEGORY', payload: value });
-    } else {
-      dispatchSelectedCategories({ type: 'REMOVE_CATEGORY', payload: value });
-    }
+  const handleCategoryChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const selectedOptions = Array.from(event.target.selectedOptions);
+    const selectedValues = selectedOptions.map((option) => option.value);
+    dispatchSelectedCategories({
+      type: 'SET_CATEGORIES',
+      payload: selectedValues,
+    });
   };
 
   useEffect(() => {
     if (selectedCategories.length === 0) {
       setState((prevState) => ({
         ...prevState,
+        visiblePosts: 5,
         filteredPosts: prevState.posts,
       }));
     } else {
@@ -83,6 +88,7 @@ function App() {
       );
       setState((prevState) => ({
         ...prevState,
+        visiblePosts: 5,
         filteredPosts: filtered,
       }));
     }
@@ -100,32 +106,40 @@ function App() {
       <header>
         <h1 className="title">Blog Posts</h1>
       </header>
-      <section>
-        <h2 className="section-title">Filter by Category:</h2>
-        {state.posts.length > 0 &&
-          Array.from<string>(
-            new Set(
-              state.posts.reduce((categories: Set<string>, post) => {
-                post.categories.forEach((category) => {
-                  categories.add(category.name);
-                });
-                return categories;
-              }, new Set<string>())
-            )
-          ).map((categoryName) => (
-            <div key={categoryName}>
-              <label>
-                <input
-                  type="checkbox"
-                  value={categoryName}
-                  checked={selectedCategories.includes(categoryName)}
-                  onChange={handleCategoryChange}
-                />
-                {categoryName}
-              </label>
-            </div>
-          ))}
-      </section>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <section
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            flexDirection: 'column',
+          }}
+        >
+          <h2 className="section-title">Filter by Category:</h2>
+          {state.posts.length > 0 && (
+            <select
+              multiple
+              value={selectedCategories}
+              onChange={handleCategoryChange}
+              style={{ marginTop: '2rem', width: '100%' }}
+            >
+              {Array.from(
+                new Set(
+                  state.posts.reduce((categories, post) => {
+                    post.categories.forEach((category) => {
+                      categories.add(category.name);
+                    });
+                    return categories;
+                  }, new Set<string>())
+                )
+              ).map((categoryName) => (
+                <option key={categoryName} value={categoryName}>
+                  {categoryName}
+                </option>
+              ))}
+            </select>
+          )}
+        </section>
+      </div>
 
       <main>
         <ul>
